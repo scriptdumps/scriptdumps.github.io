@@ -57,6 +57,7 @@
 
   <script>
     const aeScript = `local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
@@ -64,14 +65,15 @@ local hrp = character:WaitForChild("HumanoidRootPart")
 local humanoid = character:WaitForChild("Humanoid")
 
 -- Configuration
-local jumpStrength = 115
-local canJump = true
+local jumpStrength = 130 -- Increased slightly for better feel
 local cooldownTime = 0.5
+local canJump = true
 
--- Disable default jump height so our VectorForce takes over
-humanoid.JumpPower = 0 
+-- Settings to allow our custom force to work
+humanoid.UseJumpPower = true
+humanoid.JumpPower = 0 -- Keep this at 0 so the internal jump doesn't push us
 
--- Setup Physics Objects
+-- Setup Physics
 local attachment = Instance.new("Attachment")
 attachment.Parent = hrp
 
@@ -81,31 +83,45 @@ vForce.Force = Vector3.new(0, 0, 0)
 vForce.RelativeTo = Enum.ActuatorRelativeTo.World
 vForce.Parent = hrp
 
--- This function runs regardless of the device type (PC/Mobile/Console)
-humanoid.Jumping:Connect(function(active)
-    -- 'active' is true the moment the player tries to jump
-    if active and canJump and humanoid.FloorMaterial ~= Enum.Material.Air then
-        canJump = false
-        
-        -- Calculate mass of the entire character for consistent height
-        local totalMass = 0
-        for _, part in pairs(character:GetChildren()) do
-            if part:IsA("BasePart") then
-                totalMass = totalMass + part:GetMass()
-            end
-        end
-        
-        -- Apply the Force
-        vForce.Force = Vector3.new(0, jumpStrength * totalMass, 0)
-        
-        -- Short delay for the "push" upward
-        task.wait(0.1)
-        vForce.Force = Vector3.new(0, 0, 0)
-        
-        -- Cooldown before allowing another jump
-        task.wait(cooldownTime)
-        canJump = true
-    end
+-- Function to handle the jump logic
+local function performJump()
+	if canJump and humanoid.FloorMaterial ~= Enum.Material.Air then
+		canJump = false
+		
+		-- Calculate mass of character
+		local totalMass = 0
+		for _, v in pairs(character:GetDescendants()) do
+			if v:IsA("BasePart") then
+				totalMass = totalMass + v:GetMass()
+			end
+		end
+		
+		-- Apply Impulse
+		-- We multiply by gravity to ensure we actually leave the ground
+		local forceAmount = totalMass * (workspace.Gravity + jumpStrength)
+		vForce.Force = Vector3.new(0, forceAmount, 0)
+		
+		task.wait(0.15) -- Duration of the "push"
+		vForce.Force = Vector3.new(0, 0, 0)
+		
+		task.wait(cooldownTime)
+		canJump = true
+	end
+end
+
+-- Detection for Mobile & PC
+-- We check StateChanged because Jumping event can be unreliable when JumpPower is 0
+humanoid.StateChanged:Connect(function(_, newState)
+	if newState == Enum.HumanoidStateType.Jumping then
+		performJump()
+	end
+end)
+
+-- Double check for mobile button taps specifically
+humanoid:GetPropertyChangedSignal("Jump"):Connect(function()
+	if humanoid.Jump then
+		performJump()
+	end
 end)
 `;
 
