@@ -1,4 +1,62 @@
-local Players = game:GetService("Players")
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AE Script Copier</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0b0f1a;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #e6e9f0;
+    }
+    .container {
+      text-align: center;
+      padding: 30px;
+      background: #11162a;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.5);
+      max-width: 600px;
+      width: 90%;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 16px 28px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 14px;
+      background: #2f7bff;
+      color: white;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+    }
+    button:hover { background: #5da9ff; }
+    button:active { transform: scale(.96); }
+    .status {
+      margin-top: 15px;
+      font-size: .95rem;
+      opacity: .8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>AE Script Copier</h1>
+    <button id="copyBtn">Copy AE Script</button>
+    <div class="status" id="status">Click the button to copy the script</div>
+
+  </div>
+
+  <script>
+    const aeScript = `"local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
@@ -39,3 +97,18 @@ UserInputService.InputBegan:Connect(function(input, processed)
         end
     end
 end)
+"
+"print(\"Hello from AE\")"
+"-- Add more lines as needed"`;
+
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(aeScript).then(() => {
+        document.getElementById('status').innerText = 'AE script copied to clipboard!';
+      }).catch(() => {
+        document.getElementById('status').innerText = 'Failed to copy script';
+      });
+    });
+  </script>
+</body>
+</html>
+
