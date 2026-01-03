@@ -56,7 +56,46 @@
   </div>
 
   <script>
-    const aeScript = `
+    const aeScript = `local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+
+local hasBoosted = false
+
+local localPlayer = Players.LocalPlayer
+local char = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+
+local hrp = char:FindFirstChild("HumanoidRootPart")
+local hum = char:FindFirstChild("Humanoid")
+
+localPlayer.CharacterAdded:Connect(function(newChar)
+    char = newChar
+    hrp = char:WaitForChild("HumanoidRootPart")
+    hum = char:WaitForChild("Humanoid")
+end)
+
+local function autoBoostOffHead(head)
+    if head.Name ~= "Head" or not head:IsA("BasePart") then return end
+
+    local state = hum:GetState()
+    local distance = (hrp.Position - head.Position).Magnitude
+
+    if (state == Enum.HumanoidStateType.Freefall or state == Enum.HumanoidStateType.Jumping) and distance < 5 and not hasBoosted then
+        hrp.AssemblyLinearVelocity = Vector3.new(hrp.AssemblyLinearVelocity.X, 54, hrp.AssemblyLinearVelocity.Z)
+        hasBoosted = true
+    end
+    hasBoosted = false
+end
+
+RunService.RenderStepped:Connect(function()
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= localPlayer and player.Character then
+            local head = player.Character:FindFirstChild("Head")
+            if head then
+                autoBoostOffHead(head)
+            end
+        end
+    end
+end)
 `;
 
     document.getElementById('copyBtn').addEventListener('click', () => {
