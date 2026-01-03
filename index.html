@@ -87,71 +87,56 @@
     <p>Quick copy • Clean previews • All your scripts in one place</p>
   </header>
 
-  <main>
-    <div class="script">
-      <div class="script-header">
-        <div class="script-title">Universal Script</div>
-        <button class="copy-btn" onclick="copyScript('script4')">Copy</button>
-      </div>
-      <pre class="preview" id="script4">Loading...</pre>
-    </div>
-
-    <div class="script">
-      <div class="script-header">
-        <div class="script-title">LateClick Script</div>
-        <button class="copy-btn" onclick="copyScript('script5')">Copy</button>
-      </div>
-      <pre class="preview" id="script5">Loading...</pre>
-    </div>
-      <div class="script">
-      <div class="script-header">
-        <div class="script-title">WS Script</div>
-        <button class="copy-btn" onclick="copyScript('script6')">Copy</button>
-      </div>
-      <pre class="preview" id="script6">Loading...</pre>
-    </div>
-
-    <div class="script">
-      <div class="script-header">
-        <div class="script-title">AutoJP Script</div>
-        <button class="copy-btn" onclick="copyScript('script7')">Copy</button>
-      </div>
-      <pre class="preview" id="script7">Loading...</pre>
-    </div>
-  </main>
+  <main id="scripts"></main>
 
   <footer>
     © 2026 ScriptDump • Made for fast copying
   </footer>
 
   <script>
-    const scripts = {
-      script1: '/freeze.txt',
-      script2: '/freeze1.txt',
-      script3: '/ae.txt',
-      script4: '/uni.txt',
-      script5: '/lateclick.txt',
-      script6: '/ws.txt',
-      script7: '/autojp.txt'
-    };
+    const scripts = [
+      { id: 'freeze', title: 'Freeze Script', path: '/freeze.txt' },
+      { id: 'freeze1', title: 'Freeze v2 Script', path: '/freeze1.txt' },
+      { id: 'ae', title: 'AE Script', path: '/ae.txt' },
+      { id: 'uni', title: 'Universal Script', path: '/uni.txt' },
+      { id: 'lateclick', title: 'LateClick Script', path: '/lateclick.txt' },
+      { id: 'ws', title: 'WS Script', path: '/ws.txt' },
+      { id: 'autojp', title: 'AutoJP Script', path: '/autojp.txt' }
+    ];
+
+    function createScriptCard(script) {
+      return `
+        <div class="script">
+          <div class="script-header">
+            <div class="script-title">${script.title}</div>
+            <button class="copy-btn" onclick="copyScript('${script.id}')">Copy</button>
+          </div>
+          <pre class="preview" id="${script.id}">Loading...</pre>
+        </div>
+      `;
+    }
 
     async function loadScripts() {
-      for (const id in scripts) {
+      const container = document.getElementById('scripts');
+      scripts.forEach(s => {
+        container.insertAdjacentHTML('beforeend', createScriptCard(s));
+      });
+
+      for (const script of scripts) {
         try {
-          const res = await fetch(scripts[id]);
+          const res = await fetch(script.path);
+          if (!res.ok) throw new Error('HTTP error');
           const text = await res.text();
-          document.getElementById(id).textContent = text;
+          document.getElementById(script.id).textContent = text;
         } catch (e) {
-          document.getElementById(id).textContent = 'Failed to load script.';
+          document.getElementById(script.id).textContent = 'Failed to load ' + script.path;
         }
       }
     }
 
     function copyScript(id) {
       const text = document.getElementById(id).innerText;
-      navigator.clipboard.writeText(text).then(() => {
-        alert('Script copied!');
-      });
+      navigator.clipboard.writeText(text);
     }
 
     loadScripts();
