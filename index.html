@@ -90,7 +90,7 @@
   <main>
     <div class="script">
       <div class="script-header">
-        <div class="script-title">Example Script #1</div>
+        <div class="script-title">Freeze Script</div>
         <button class="copy-btn" onclick="copyScript('script1')">Copy</button>
       </div>
       <pre class="preview" id="script1">Loading...</pre>
@@ -98,7 +98,7 @@
 
     <div class="script">
       <div class="script-header">
-        <div class="script-title">Example Script #2</div>
+        <div class="script-title">Freeze v2 Script</div>
         <button class="copy-btn" onclick="copyScript('script2')">Copy</button>
       </div>
       <pre class="preview" id="script2">Loading...</pre>
@@ -106,10 +106,18 @@
 
     <div class="script">
       <div class="script-header">
-        <div class="script-title">Example Script #3</div>
+        <div class="script-title">AE Script</div>
         <button class="copy-btn" onclick="copyScript('script3')">Copy</button>
       </div>
       <pre class="preview" id="script3">Loading...</pre>
+    </div>
+
+    <div class="script">
+      <div class="script-header">
+        <div class="script-title">Universal Script</div>
+        <button class="copy-btn" onclick="copyScript('script4')">Copy</button>
+      </div>
+      <pre class="preview" id="script4">Loading...</pre>
     </div>
   </main>
 
@@ -119,9 +127,10 @@
 
   <script>
     const scripts = {
-      script1: '/ae.txt',
-      script2: '/freeze.txt',
-      script3: '/uni.txt'
+      script1: '/freeze.txt',
+      script2: '/freeze1.txt',
+      script3: '/ae.txt',
+      script4: '/uni.txt'
     };
 
     async function loadScripts() {
