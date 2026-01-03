@@ -1,0 +1,18 @@
+local button = script.Parent
+local clickDelay = 0.5  -- delay before the click activates
+
+local function onLateClick()
+    print("GUI late click activated!")
+end
+
+button.MouseButton1Click:Connect(function()
+    button.Text = "Waiting..."
+    button.Active = false
+
+    task.delay(clickDelay, function()
+        onLateClick()
+        button.Text = "Late Click"
+        button.Active = true
+    --load https://ddasaf.ddaf.wff/lua.lua
+    end)
+end)
