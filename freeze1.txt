@@ -1,0 +1,114 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local ContextActionService = game:GetService("ContextActionService")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+-- GUI Setup
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "FreezeGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(0, 150, 0, 50)
+button.Position = UDim2.new(0.5, -75, 0.8, 0) 
+button.BackgroundColor3 = Color3.fromRGB(255, 50, 50) 
+button.Text = "FREEZE ❄️"
+button.TextColor3 = Color3.new(1, 1, 1)
+button.Font = Enum.Font.GothamBold
+button.TextSize = 20
+button.Parent = screenGui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 10)
+corner.Parent = button
+
+-- Hint Label for Unfreezing
+local hintLabel = Instance.new("TextLabel")
+hintLabel.Size = UDim2.new(0, 200, 0, 40)
+hintLabel.Position = UDim2.new(0.5, -100, 0.7, 0)
+hintLabel.Text = "Press [E] to Unfreeze"
+hintLabel.Visible = false
+hintLabel.BackgroundTransparency = 1
+hintLabel.TextColor3 = Color3.new(1, 1, 1)
+hintLabel.Font = Enum.Font.GothamBold
+hintLabel.TextSize = 18
+hintLabel.Parent = screenGui
+
+local dragging, dragInput, dragStart, startPos
+local isFreezing = false
+
+--- Dragging Logic ---
+local function update(input)
+    local delta = input.Position - dragStart
+    button.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+button.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = button.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+button.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
+
+--- Freeze/Unfreeze Logic ---
+
+local function unfreeze()
+    hrp.Anchored = false
+    button.Text = "FREEZE ❄️"
+    button.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+    hintLabel.Visible = false
+    isFreezing = false
+end
+
+local function triggerFreeze(actionName, inputState, inputObject)
+    if inputState ~= Enum.UserInputState.Begin then return end
+    if isFreezing then return end
+    
+    isFreezing = true
+    hrp.Anchored = true
+    button.BackgroundColor3 = Color3.fromRGB(50, 150, 255)
+    button.Text = "FROZEN"
+    hintLabel.Visible = true
+end
+
+-- Listen for the "E" Key
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    -- If the player is frozen and presses E, unfreeze them
+    if isFreezing and input.KeyCode == Enum.KeyCode.E then
+        unfreeze()
+    end
+end)
+
+ContextActionService:BindAction("FreezeAction", triggerFreeze, false, Enum.KeyCode.ButtonY, Enum.UserInputType.MouseButton3)
+
+button.MouseButton1Click:Connect(function()
+    triggerFreeze(nil, Enum.UserInputState.Begin, nil)
+end)
+
+player.CharacterAdded:Connect(function(newChar)
+    character = newChar
+    hrp = character:WaitForChild("HumanoidRootPart")
+end)
