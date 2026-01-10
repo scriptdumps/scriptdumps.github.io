@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Delta Executor Install</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Inter, Arial, sans-serif;
+      background: #0b0f19;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    button {
+      background: #4da3ff;
+      border: none;
+      padding: 16px 28px;
+      font-size: 18px;
+      border-radius: 10px;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #368ce0;
+    }
+  </style>
+</head>
+<body>
+  <button onclick="install()">Install Delta Executor</button>
+
+  <script>
+    function install() {
+      window.location.href =
+        "itms-services://?action=download-manifest&url=https://delta.bz/manifest.plist";
+    }
+  </script>
+</body>
+</html>
